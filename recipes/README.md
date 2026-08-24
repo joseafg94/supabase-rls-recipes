@@ -1,10 +1,10 @@
 # Recipe Catalog
 
-Recipe implementations are intentionally deferred. Each phase creates only its named recipe and must follow `docs/RECIPE_STANDARD.md`.
+Each phase creates only its named recipe and must follow `docs/RECIPE_STANDARD.md`.
 
 | Directory planned | Implementation phase | Focus |
 | --- | --- | --- |
-| `user-owned-data/` | 02 | Ownership and per-command checks |
+| [user-owned-data/](user-owned-data/) | 02 | Ownership and per-command checks |
 | `organization-membership/` | 03 | Relationship-based tenant access |
 | `roles-and-permissions/` | 03 | Explicit owner/admin/member operations |
 | `public-read-private-write/` | 03 | Published reads and authorized mutations |
