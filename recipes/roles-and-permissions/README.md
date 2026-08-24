@@ -72,7 +72,7 @@ npm run db:stop
 
 ## Limitations
 
-Membership administration is intentionally closed rather than partially modeled. The recipe has no invitations, last-owner invariant, custom permissions, resource ownership, or global administrator.
+Membership administration is intentionally closed rather than partially modeled. A caller with write authority in both source and destination organizations may reassign a resource because both UPDATE predicates pass; tenant immutability requires a separate rule. The recipe has no invitations, last-owner invariant, custom permissions, resource ownership, or global administrator.
 
 ## Production considerations
 

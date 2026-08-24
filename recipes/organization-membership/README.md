@@ -67,7 +67,7 @@ npm run db:stop
 
 ## Limitations
 
-Every member has identical resource permissions. Invitations, suspension, membership lifecycle, roles, public resources, and tenant deletion are intentionally absent.
+Every member has identical resource permissions. `WITH CHECK` validates the destination membership but does not make `organization_id` immutable, so a caller who is a member of both organizations may move a resource between them; production systems that prohibit moves must add an explicit immutability rule. Invitations, suspension, membership lifecycle, roles, public resources, and tenant deletion are intentionally absent.
 
 ## Production considerations
 

@@ -27,6 +27,7 @@ Each recipe is an isolated fixture with schema, policies, seed data, tests, and 
 The reproducible local foundation, seven independent recipes, adversarial matrices, and pinned local-only CI workflow are present. CI uses the project-scoped Supabase CLI and requires no hosted project or credentials.
 
 The pre-foundation repository/tooling audit is recorded in [AUDIT_2026-08-24.md](AUDIT_2026-08-24.md).
+The independent access-path review and residual-risk disposition are recorded in [SECURITY_AUDIT_2026-08-24.md](SECURITY_AUDIT_2026-08-24.md).
 
 ## Decision record
 

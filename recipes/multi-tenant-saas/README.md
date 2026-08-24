@@ -95,7 +95,7 @@ The recipe applies schema, policies, and deterministic seeds inside its pgTAP tr
 
 ## Limitations
 
-Membership lifecycle, invitations, last-owner invariants, per-resource ownership, custom permissions, public data, soft deletion, audit logging, Storage, and privileged administration are intentionally absent.
+Membership lifecycle, invitations, last-owner invariants, per-resource ownership, custom permissions, public data, soft deletion, audit logging, Storage, and privileged administration are intentionally absent. UPDATE validates authority in both old and new tenant scopes but does not prohibit reassignment when the caller has write authority in both; production systems requiring immutable tenant ownership must add that invariant explicitly.
 
 ## Production considerations
 
