@@ -86,4 +86,6 @@ Follow [CONTRIBUTING_RECIPES.md](docs/CONTRIBUTING_RECIPES.md), the recipe templ
 
 MIT licensed. Copyright © 2026 Fontesio. See [LICENSE](LICENSE).
 
+See the [changelog](CHANGELOG.md) and [0.1.0 release evidence](docs/RELEASE_0.1.0.md).
+
 Supabase is a trademark of its respective owner. This independent project is not an official Supabase repository and its examples must be reviewed against the current Supabase and PostgreSQL documentation before production use.

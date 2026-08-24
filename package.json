@@ -4,6 +4,14 @@
   "private": true,
   "description": "Reproducible Supabase Row Level Security reference recipes.",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joseafg94/supabase-rls-recipes.git"
+  },
+  "homepage": "https://github.com/joseafg94/supabase-rls-recipes#readme",
+  "bugs": {
+    "url": "https://github.com/joseafg94/supabase-rls-recipes/issues"
+  },
   "scripts": {
     "supabase": "supabase",
     "db:start": "supabase start",

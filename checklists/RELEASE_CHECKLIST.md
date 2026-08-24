@@ -1,16 +1,16 @@
 # Release Checklist
 
-- [ ] SQL syntax and clean rebuild verified on documented tool versions.
-- [ ] Every published recipe passes `RECIPE_CHECKLIST.md`.
-- [ ] Every recipe has positive and negative tests.
-- [ ] Bidirectional cross-tenant isolation passes where applicable.
-- [ ] Storage authorization tests cover declared operations.
-- [ ] Catalog verification matches intended grants, RLS flags, policies, roles, and indexes.
-- [ ] Security checklist and independent security review pass.
-- [ ] Secret/data scan passes, including generated artifacts.
-- [ ] README, local reproduction, limitations, and architecture docs match behavior.
-- [ ] Internal links and recipe commands are verified.
-- [ ] Migration/drift guidance remains non-destructive and current.
-- [ ] CI strategy and evidence are documented.
-- [ ] MIT license, 2026 Fontesio attribution, version, and release notes are present.
-- [ ] No unresolved high-risk finding or failed deny case remains.
+- [x] SQL syntax and clean rebuild verified on documented tool versions. [Evidence](../docs/RELEASE_0.1.0.md#verification-evidence)
+- [x] Every published recipe passes `RECIPE_CHECKLIST.md`. [Evidence](../docs/RELEASE_0.1.0.md#recipe-gates)
+- [x] Every recipe has positive and negative tests. [Evidence](../docs/RELEASE_0.1.0.md#recipe-gates)
+- [x] Bidirectional cross-tenant isolation passes where applicable. [Evidence](../docs/RELEASE_0.1.0.md#recipe-gates)
+- [x] Storage authorization tests cover declared operations. [Evidence](../docs/RELEASE_0.1.0.md#recipe-gates)
+- [x] Catalog verification matches intended grants, RLS flags, policies, roles, and indexes. [Evidence](../docs/RELEASE_0.1.0.md#recipe-gates)
+- [x] Security checklist and independent security review pass. [Evidence](../docs/RELEASE_0.1.0.md#security-disposition)
+- [x] Secret/data scan passes, including generated artifacts. [Evidence](../docs/RELEASE_0.1.0.md#verification-evidence)
+- [x] README, local reproduction, limitations, and architecture docs match behavior. [Evidence](../docs/RELEASE_0.1.0.md#documentation-links-and-drift)
+- [x] Internal links and recipe commands are verified. [Evidence](../docs/RELEASE_0.1.0.md#documentation-links-and-drift)
+- [x] Migration/drift guidance remains non-destructive and current. [Evidence](../docs/RELEASE_0.1.0.md#documentation-links-and-drift)
+- [x] CI strategy and evidence are documented. [Evidence](../docs/RELEASE_0.1.0.md#verification-evidence)
+- [x] MIT license, 2026 Fontesio attribution, version, and release notes are present. [Evidence](../docs/RELEASE_0.1.0.md#release-identity)
+- [x] No unresolved high-risk finding or failed deny case remains. [Evidence](../docs/RELEASE_0.1.0.md#security-disposition)
