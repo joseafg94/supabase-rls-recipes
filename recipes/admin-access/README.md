@@ -30,6 +30,7 @@ A secret or legacy `service_role` key bypasses RLS. The backend therefore needs 
 ## Run from a clean local stack
 
 ```sh
+npm ci
 npm run db:start
 npm run db:reset
 npx supabase test db recipes/admin-access/tests.sql --local
@@ -39,6 +40,8 @@ npm run db:stop
 ```
 
 The API test reads local credentials from `supabase status -o json` in memory and never prints them. Alice and Bob requests use user JWTs. The secret is used only for the named bypass assertion.
+
+[`tests.sql`](tests.sql) contains 14 catalog, ordinary-user isolation, reassignment-denial, and bypass assertions. [`api-tests.mjs`](api-tests.mjs) adds 8 API assertions contrasting user JWT behavior with the single backend-only bypass case.
 
 ## Credential custody
 
@@ -53,7 +56,6 @@ Keep secret keys in a server-side secret manager or protected environment, never
 
 ## Official references
 
-- [API keys and bypass behavior](https://supabase.com/docs/guides/api/api-keys)
-- [Securing the Data API](https://supabase.com/docs/guides/database/hardening-data-api)
+- [API keys and bypass behavior](https://supabase.com/docs/guides/getting-started/api-keys)
+- [Securing the Data API](https://supabase.com/docs/guides/api/securing-your-api)
 - [PostgreSQL row security](https://www.postgresql.org/docs/current/ddl-rowsecurity.html)
-

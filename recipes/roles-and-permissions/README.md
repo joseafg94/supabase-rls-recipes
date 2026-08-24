@@ -36,7 +36,7 @@ A separate trusted workflow provisions roles. App users can read only their own 
 
 ## Policy explanation
 
-Organization and resource predicates query the caller's protected membership row. Owner policies cover organization update/delete and resource delete; owner/admin policies cover resource insert/update; all members share resource SELECT. UPDATE uses matching `USING` and `WITH CHECK`, preventing tenant reassignment. Membership SELECT is limited to the caller and has no mutation grants or policies, so self-enrollment and self-escalation fail before they can alter authorization facts.
+Organization and resource predicates query the caller's protected membership row. Owner policies cover organization update/delete and resource delete; owner/admin policies cover resource insert/update; all members share resource SELECT. UPDATE uses matching `USING` and `WITH CHECK`, preventing reassignment into a tenant where the caller lacks write authority. Membership SELECT is limited to the caller and has no mutation grants or policies, so self-enrollment and self-escalation fail before they can alter authorization facts.
 
 Applicable policies are separated by command. Owner/admin membership checks coexist inside a single policy for insert/update, so there is no broader permissive policy that accidentally grants members write access.
 

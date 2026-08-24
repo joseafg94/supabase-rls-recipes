@@ -41,6 +41,7 @@ The organization UUID in a browser-provided path is only an input. The policy ex
 ## Run from a clean local stack
 
 ```sh
+npm ci
 npm run db:start
 npm run db:reset
 npx supabase test db recipes/storage-isolation/tests.sql --local
@@ -53,7 +54,7 @@ The API test obtains local-only credentials from `supabase status -o json` witho
 
 ## What the API matrix proves
 
-The test covers private-bucket upload, list, download, update, upsert, and delete; both Alice and Bob; anonymous reads; cross-user requests; forged organization and owner folders; bucket scope; and an exact empty final object set. Upsert is intentionally checked because it requires `SELECT` and `UPDATE` in addition to `INSERT`.
+[`tests.sql`](tests.sql) contains 14 catalog and relationship-isolation assertions. [`api-tests.mjs`](api-tests.mjs) covers private-bucket upload, list, download, update, upsert, and delete; both Alice and Bob; anonymous reads; cross-user requests; forged organization and owner folders; bucket scope; and an exact empty final object set. Upsert is intentionally checked because it requires `SELECT` and `UPDATE` in addition to `INSERT`.
 
 ## Assumptions and limitations
 
@@ -73,4 +74,4 @@ Keep the bucket private, validate file constraints independently, index every re
 - [Storage schema design](https://supabase.com/docs/guides/storage/schema/design)
 - [Storage helper functions](https://supabase.com/docs/guides/storage/schema/helper-functions)
 - [Storage buckets](https://supabase.com/docs/guides/storage/buckets/fundamentals)
-- [API keys and credential custody](https://supabase.com/docs/guides/api/api-keys)
+- [API keys and credential custody](https://supabase.com/docs/guides/getting-started/api-keys)

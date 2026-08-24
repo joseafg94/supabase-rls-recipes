@@ -62,7 +62,7 @@ npm run db:stop
 
 - Comparing a row tenant ID only to a client parameter instead of a trusted membership.
 - Leaving the membership table readable or writable without an explicit model.
-- Omitting `WITH CHECK`, allowing a resource to move tenants.
+- Omitting `WITH CHECK`, allowing a resource to move into a tenant where the caller has no membership.
 - Forgetting indexes on membership/resource lookup columns.
 
 ## Limitations

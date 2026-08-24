@@ -64,3 +64,7 @@ Current CLI guidance confirms that `supabase test db` wraps each pgTAP file in a
 ## Phase 06 evidence — 2026-08-24
 
 The exact CI sequence completed locally with a clean `npm ci`: 4 foundation assertions, 276 recipe SQL assertions, 27 Storage API assertions, 8 admin boundary API assertions, 28 cataloged negative operations, schema lint, and the privileged credential scan all passed. Temporarily replacing the user-owned `SELECT` ownership predicate with `true` caused the expected 4-of-35 failure, including `[deny:select]`; restoring the predicate and rerunning `verify:ci` returned the full suite to green.
+
+## Current audit evidence — 2026-08-24
+
+The Phase 07 clean CI run retained the Phase 06 totals and added 10 combined-catalog assertions covering effective grants, policy composition, indexes, views, functions, and `SECURITY DEFINER` exposure. The database advisor reported one intentional anonymous-access warning and 13 informational findings; their disposition and residual risks are recorded in [the security audit](SECURITY_AUDIT_2026-08-24.md).

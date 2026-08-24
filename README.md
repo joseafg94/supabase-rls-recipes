@@ -18,17 +18,17 @@ An RLS policy can look correct in isolation while the effective policy set permi
 - Keep `service_role` and secret keys in trusted server environments; they bypass RLS.
 - Secure `storage.objects` independently from application tables.
 
-## Planned recipes
+## Implemented recipes
 
 | Recipe | Boundary demonstrated |
 | --- | --- |
-| User-owned data | A user can operate only on rows they own |
-| Organization membership | Membership controls tenant resource access |
-| Roles and permissions | Owner, admin, and member operations are explicit |
-| Public read/private write | Published reads are public; mutations remain authorized |
-| Multi-tenant SaaS | End-to-end tenant isolation across related tables |
-| Storage isolation | Bucket, path, ownership, and tenant controls |
-| Admin access | Trusted backend operations remain separate from app-user authorization |
+| [User-owned data](recipes/user-owned-data/README.md) | A user can operate only on rows they own |
+| [Organization membership](recipes/organization-membership/README.md) | Membership controls tenant resource access |
+| [Roles and permissions](recipes/roles-and-permissions/README.md) | Owner, admin, and member operations are explicit |
+| [Public read/private write](recipes/public-read-private-write/README.md) | Published reads are public; mutations remain authorized |
+| [Multi-tenant SaaS](recipes/multi-tenant-saas/README.md) | End-to-end tenant isolation across related tables |
+| [Storage isolation](recipes/storage-isolation/README.md) | Bucket, path, ownership, and tenant controls |
+| [Admin access](recipes/admin-access/README.md) | Trusted backend operations remain separate from app-user authorization |
 
 All cataloged recipes are implemented and linked from [recipes/README.md](recipes/README.md). Their required shape is defined in [docs/RECIPE_STANDARD.md](docs/RECIPE_STANDARD.md).
 
@@ -49,7 +49,7 @@ npm run db:stop
 
 ```text
 docs/        Architecture, security model, operations, and standards
-recipes/     Planned reproducible SQL recipes
+recipes/     Implemented reproducible SQL recipes
 templates/   Required authoring formats
 checklists/  Review and release gates
 prompts/     Scoped implementation phases with stop conditions
