@@ -4,13 +4,13 @@ begin;
 \ir policies.sql
 \ir seed.sql
 
-select plan(38);
+select plan(41);
 
 set local role anon;
 
 select is(current_user::text, 'anon', 'Anonymous role is active');
 select is((select count(*) from public.public_content_items), 2::bigint, 'Anonymous sees only published rows');
-select is((select count(*) from public.public_content_items where not published), 0::bigint, 'Anonymous sees no drafts');
+select is((select count(*) from public.public_content_items where not published), 0::bigint, '[deny:select] Anonymous sees no drafts');
 select results_eq(
   $$select title from public.public_content_items order by title$$,
   $$values ('Alice published'::text), ('Bob published'::text)$$,
@@ -20,10 +20,10 @@ select throws_ok(
   $$insert into public.public_content_items (id, owner_id, title) values ('50000000-0000-4000-8000-000000000010', '00000000-0000-4000-8000-000000000001', 'Anonymous insert')$$,
   '42501',
   'permission denied for table public_content_items',
-  'Anonymous insert is denied'
+  '[deny:insert] Anonymous insert is denied'
 );
-select throws_ok($$update public.public_content_items set title = 'Anonymous update' where id = '50000000-0000-4000-8000-000000000001'$$, '42501', 'permission denied for table public_content_items', 'Anonymous update is denied');
-select throws_ok($$delete from public.public_content_items where id = '50000000-0000-4000-8000-000000000001'$$, '42501', 'permission denied for table public_content_items', 'Anonymous delete is denied');
+select throws_ok($$update public.public_content_items set title = 'Anonymous update' where id = '50000000-0000-4000-8000-000000000001'$$, '42501', 'permission denied for table public_content_items', '[deny:update] Anonymous update is denied');
+select throws_ok($$delete from public.public_content_items where id = '50000000-0000-4000-8000-000000000001'$$, '42501', 'permission denied for table public_content_items', '[deny:delete] Anonymous delete is denied');
 
 reset role;
 select set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-000000000001', true);
@@ -92,6 +92,9 @@ select is((select count(*) from public.public_content_items where id in ('500000
 select is((select count(*) from public.public_content_items), 6::bigint, 'Final state contains only authorized survivors');
 select is((select count(*) from public.public_content_items where published), 4::bigint, 'Final state has four published rows');
 select is((select count(*) from public.public_content_items where not published), 2::bigint, 'Final state has two private drafts');
+select is((select count(*) from pg_class c join pg_namespace n on n.oid = c.relnamespace where n.nspname = 'public' and c.relname = 'public_content_items' and c.relrowsecurity), 1::bigint, 'Catalog confirms RLS on the content table');
+select is((select count(*) from pg_policies where schemaname = 'public' and tablename = 'public_content_items'), 5::bigint, 'Catalog confirms public-read and owner policy composition');
+select is((select count(*) from pg_policies where schemaname = 'public' and tablename = 'public_content_items' and cmd = 'UPDATE' and with_check is not null), 1::bigint, 'Catalog confirms owner UPDATE WITH CHECK');
 
 select * from finish();
 rollback;

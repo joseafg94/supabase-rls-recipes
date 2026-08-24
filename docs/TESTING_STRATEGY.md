@@ -41,7 +41,7 @@ Additional fixture UUIDs use a documented category prefix and monotonically incr
 
 ## Local commands
 
-Run `npm ci`, `npm run db:start`, `npm run verify:db`, and `npm run db:stop`. `verify:db` uses explicit local-only flags for reset, lint, and pgTAP; it must never be changed to `--linked`.
+Run the same sequence used by CI: `npm ci`, `npm run db:start`, `npm run verify:ci`, and `npm run db:stop`. `verify:ci` resets between independent SQL/API layers and uses explicit local-only flags; it must never be changed to `--linked`.
 
 ## Assertions
 
@@ -55,6 +55,12 @@ Run `npm ci`, `npm run db:start`, `npm run verify:db`, and `npm run db:stop`. `v
 
 Exercise upload, download/list behavior, update/upsert, and delete through the Storage API where object semantics matter. Remember that upsert requires `INSERT`, `SELECT`, and `UPDATE` policies. Do not manipulate Storage metadata directly as a substitute for object operations.
 
-## CI direction
+## CI
 
-Phase 06 should create a pinned, reproducible job that starts local Supabase, rebuilds from source, runs all matrices, validates formatting/syntax as selected in phase 01, scans for secrets, and exits nonzero on any missing or failed deny case. CI must not need a hosted project or production credentials.
+`.github/workflows/verify.yml` pins action commits, Node 24.11.1, and the lockfile-installed Supabase CLI 2.115.0. `scripts/verify-test-catalog.mjs` requires an explicit `[deny:<operation>]` assertion for every supported recipe operation; `scripts/verify-ci.mjs` then rebuilds, lints, runs every SQL/API matrix, and scans source files for privileged credential values. The job has no hosted Supabase dependency or repository secret.
+
+Current CLI guidance confirms that `supabase test db` wraps each pgTAP file in a transaction and that `supabase db reset --local` recreates the local database from committed migrations. See [Supabase automated CI testing](https://supabase.com/docs/guides/deployment/ci/testing) and [CLI testing and linting](https://supabase.com/docs/guides/local-development/cli/testing-and-linting).
+
+## Phase 06 evidence — 2026-08-24
+
+The exact CI sequence completed locally with a clean `npm ci`: 4 foundation assertions, 276 recipe SQL assertions, 27 Storage API assertions, 8 admin boundary API assertions, 28 cataloged negative operations, schema lint, and the privileged credential scan all passed. Temporarily replacing the user-owned `SELECT` ownership predicate with `true` caused the expected 4-of-35 failure, including `[deny:select]`; restoring the predicate and rerunning `verify:ci` returned the full suite to green.

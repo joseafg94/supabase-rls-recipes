@@ -4,7 +4,7 @@ begin;
 \ir policies.sql
 \ir seed.sql
 
-select plan(43);
+select plan(47);
 
 select set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-000000000001', true);
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-000000000001","role":"authenticated"}', true);
@@ -12,10 +12,11 @@ set local role authenticated;
 
 select is((select auth.uid()), '00000000-0000-4000-8000-000000000001'::uuid, 'Alice owner identity is active');
 select is((select count(*) from public.role_organizations), 2::bigint, 'Alice sees her two organizations');
-select is((select count(*) from public.role_organizations where id = '10000000-0000-4000-8000-000000000002'), 0::bigint, 'Alice cannot see Org B');
+select is((select count(*) from public.role_organizations where id = '10000000-0000-4000-8000-000000000002'), 0::bigint, '[deny:select] Alice cannot see Org B');
 select is((select count(*) from public.role_members), 2::bigint, 'Alice sees only her two role rows');
 select lives_ok($$update public.role_organizations set name = 'Role Organization A updated' where id = '10000000-0000-4000-8000-000000000001'$$, 'Owner updates her organization');
 select is_empty($$update public.role_organizations set name = 'Cross-org update' where id = '10000000-0000-4000-8000-000000000002' returning 1$$, 'Owner cannot update another organization');
+select is_empty($$delete from public.role_organizations where id = '10000000-0000-4000-8000-000000000002' returning 1$$, '[deny:delete] Owner cannot delete another organization');
 select results_eq($$delete from public.role_organizations where id = '10000000-0000-4000-8000-000000000003' returning 1$$, $$values (1)$$, 'Owner deletes her secondary organization');
 select lives_ok($$insert into public.role_resources (id, organization_id, name) values ('40000000-0000-4000-8000-000000000005', '10000000-0000-4000-8000-000000000001', 'Owner insert')$$, 'Owner inserts a resource');
 select lives_ok($$update public.role_resources set name = 'Owner updated resource' where id = '40000000-0000-4000-8000-000000000001'$$, 'Owner updates a resource');
@@ -24,7 +25,7 @@ select throws_ok(
   $$insert into public.role_resources (id, organization_id, name) values ('40000000-0000-4000-8000-000000000006', '10000000-0000-4000-8000-000000000002', 'Forged Org B resource')$$,
   '42501',
   'new row violates row-level security policy for table "role_resources"',
-  'Owner cannot insert into another organization'
+  '[deny:insert] Owner cannot insert into another organization'
 );
 
 reset role;
@@ -39,7 +40,7 @@ select is((select count(*) from public.role_resources), 2::bigint, 'Admin sees O
 select lives_ok($$insert into public.role_resources (id, organization_id, name) values ('40000000-0000-4000-8000-000000000007', '10000000-0000-4000-8000-000000000001', 'Admin insert')$$, 'Admin inserts a resource');
 select lives_ok($$update public.role_resources set name = 'Admin updated owner insert' where id = '40000000-0000-4000-8000-000000000005'$$, 'Admin updates a resource');
 select is_empty($$delete from public.role_resources where id = '40000000-0000-4000-8000-000000000001' returning 1$$, 'Admin cannot delete resources');
-select is_empty($$update public.role_resources set name = 'Admin cross-org update' where id = '40000000-0000-4000-8000-000000000003' returning 1$$, 'Admin cannot update another organization');
+select is_empty($$update public.role_resources set name = 'Admin cross-org update' where id = '40000000-0000-4000-8000-000000000003' returning 1$$, '[deny:update] Admin cannot update another organization');
 select throws_ok(
   $$insert into public.role_members (organization_id, user_id, role, joined_at) values ('10000000-0000-4000-8000-000000000002', '00000000-0000-4000-8000-000000000002', 'owner', '2026-01-02 00:00:00+00')$$,
   '42501',
@@ -105,6 +106,9 @@ select is((select count(*) from public.role_organizations where id = '10000000-0
 select is((select count(*) from public.role_organizations), 1::bigint, 'Only Org A remains');
 select is((select count(*) from public.role_resources), 3::bigint, 'Final resources reflect only permitted mutations');
 select is((select count(*) from public.role_members), 3::bigint, 'Cascades and denied escalations left correct memberships');
+select is((select count(*) from pg_class c join pg_namespace n on n.oid = c.relnamespace where n.nspname = 'public' and c.relname in ('role_organizations', 'role_members', 'role_resources') and c.relrowsecurity), 3::bigint, 'Catalog confirms RLS on all role recipe tables');
+select is((select count(*) from pg_policies where schemaname = 'public' and tablename in ('role_organizations', 'role_members', 'role_resources')), 8::bigint, 'Catalog confirms the role policy set');
+select is((select count(*) from pg_policies where schemaname = 'public' and tablename in ('role_organizations', 'role_resources') and cmd = 'UPDATE' and with_check is not null), 2::bigint, 'Catalog confirms both UPDATE WITH CHECK policies');
 
 select * from finish();
 rollback;

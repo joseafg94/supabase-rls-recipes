@@ -30,7 +30,7 @@ An RLS policy can look correct in isolation while the effective policy set permi
 | Storage isolation | Bucket, path, ownership, and tenant controls |
 | Admin access | Trusted backend operations remain separate from app-user authorization |
 
-Recipes are intentionally not implemented in this foundation phase. Their required shape is defined in [docs/RECIPE_STANDARD.md](docs/RECIPE_STANDARD.md).
+All cataloged recipes are implemented and linked from [recipes/README.md](recipes/README.md). Their required shape is defined in [docs/RECIPE_STANDARD.md](docs/RECIPE_STANDARD.md).
 
 ## Quick start
 
@@ -39,11 +39,11 @@ Prerequisites are Node.js 20+ and a running Docker-compatible runtime. The proje
 ```sh
 npm ci
 npm run db:start
-npm run verify:db
+npm run verify:ci
 npm run db:stop
 ```
 
-`verify:db` resets only the local database, lints it, and runs pgTAP. Then read [docs/PROJECT_CONTEXT.md](docs/PROJECT_CONTEXT.md), select one phase from `prompts/`, and follow its stop condition.
+`verify:ci` performs clean resets, linting, all pgTAP and API matrices, negative-coverage catalog validation, and a privileged credential scan without hosted credentials.
 
 ## Repository map
 

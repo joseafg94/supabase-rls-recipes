@@ -4,7 +4,7 @@ begin;
 \ir policies.sql
 \ir seed.sql
 
-select plan(12);
+select plan(14);
 
 select set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-000000000001', true);
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-000000000001","role":"authenticated"}', true);
@@ -35,6 +35,8 @@ select is((select count(*) from pg_policies where schemaname = 'storage' and tab
 select is((select count(*) from pg_policies where schemaname = 'storage' and tablename = 'objects' and cmd = 'SELECT' and policyname = 'users can select scoped storage objects'), 1::bigint, 'Storage SELECT policy is explicit');
 select is((select count(*) from pg_policies where schemaname = 'storage' and tablename = 'objects' and cmd = 'UPDATE' and with_check is not null), 1::bigint, 'Storage UPDATE policy has WITH CHECK');
 select is((select count(*) from pg_policies where schemaname = 'storage' and tablename = 'objects' and cmd = 'DELETE'), 1::bigint, 'Storage DELETE policy is explicit');
+select is((select count(*) from pg_class c join pg_namespace n on n.oid = c.relnamespace where n.nspname = 'public' and c.relname = 'storage_recipe_memberships' and c.relrowsecurity), 1::bigint, 'Catalog confirms RLS on Storage memberships');
+select is((select count(*) from pg_policies where schemaname = 'public' and tablename = 'storage_recipe_memberships' and cmd = 'SELECT'), 1::bigint, 'Catalog confirms the membership SELECT policy');
 
 select * from finish();
 rollback;

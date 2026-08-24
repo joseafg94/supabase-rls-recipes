@@ -4,7 +4,7 @@ begin;
 \ir policies.sql
 \ir seed.sql
 
-select plan(84);
+select plan(87);
 
 select set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-000000000001', true);
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-000000000001","role":"authenticated"}', true);
@@ -15,7 +15,7 @@ select is((select count(*) from public.saas_organizations), 1::bigint, 'Alice se
 select is((select count(*) from public.saas_organization_members), 1::bigint, 'Alice sees only her membership');
 select is((select role from public.saas_organization_members), 'owner', 'Alice sees her owner role');
 select is((select count(*) from public.saas_projects), 2::bigint, 'Alice sees Org A projects');
-select is((select count(*) from public.saas_projects where organization_id = '10000000-0000-4000-8000-000000000002'), 0::bigint, 'Alice cannot select Org B projects');
+select is((select count(*) from public.saas_projects where organization_id = '10000000-0000-4000-8000-000000000002'), 0::bigint, '[deny:select] Alice cannot select Org B projects');
 select is((select count(*) from public.saas_items), 3::bigint, 'Alice sees Org A items');
 select is((select count(*) from public.saas_items where organization_id = '10000000-0000-4000-8000-000000000002'), 0::bigint, 'Alice cannot select Org B items');
 select lives_ok($$insert into public.saas_projects (id, organization_id, name) values ('60000000-0000-4000-8000-000000000005', '10000000-0000-4000-8000-000000000001', 'Alice inserted project')$$, 'Alice inserts an Org A project');
@@ -23,10 +23,10 @@ select throws_ok(
   $$insert into public.saas_projects (id, organization_id, name) values ('60000000-0000-4000-8000-000000000008', '10000000-0000-4000-8000-000000000002', 'Alice forged Org B project')$$,
   '42501',
   'new row violates row-level security policy for table "saas_projects"',
-  'Alice cannot forge Org B on project insert'
+  '[deny:insert] Alice cannot forge Org B on project insert'
 );
 select lives_ok($$update public.saas_projects set name = 'Alice updated project' where id = '60000000-0000-4000-8000-000000000001'$$, 'Alice updates an Org A project');
-select is_empty($$update public.saas_projects set name = 'Alice cross-tenant update' where id = '60000000-0000-4000-8000-000000000003' returning 1$$, 'Alice cannot update Org B project');
+select is_empty($$update public.saas_projects set name = 'Alice cross-tenant update' where id = '60000000-0000-4000-8000-000000000003' returning 1$$, '[deny:update] Alice cannot update Org B project');
 select throws_ok(
   $$update public.saas_projects set organization_id = '10000000-0000-4000-8000-000000000002' where id = '60000000-0000-4000-8000-000000000005'$$,
   '42501',
@@ -34,7 +34,7 @@ select throws_ok(
   'Alice cannot reassign a project to Org B'
 );
 select results_eq($$delete from public.saas_projects where id = '60000000-0000-4000-8000-000000000002' returning 1$$, $$values (1)$$, 'Alice deletes an Org A project');
-select is_empty($$delete from public.saas_projects where id = '60000000-0000-4000-8000-000000000004' returning 1$$, 'Alice cannot delete Org B project');
+select is_empty($$delete from public.saas_projects where id = '60000000-0000-4000-8000-000000000004' returning 1$$, '[deny:delete] Alice cannot delete Org B project');
 select lives_ok($$insert into public.saas_items (id, organization_id, project_id, name) values ('70000000-0000-4000-8000-000000000007', '10000000-0000-4000-8000-000000000001', '60000000-0000-4000-8000-000000000001', 'Alice inserted item')$$, 'Alice inserts an Org A item');
 select throws_ok(
   $$insert into public.saas_items (id, organization_id, project_id, name) values ('70000000-0000-4000-8000-000000000010', '10000000-0000-4000-8000-000000000002', '60000000-0000-4000-8000-000000000003', 'Alice forged Org B item')$$,
@@ -185,6 +185,9 @@ select is((select name from public.saas_items where id = '70000000-0000-4000-800
 select is((select name from public.saas_items where id = '70000000-0000-4000-8000-000000000008'), 'Bob inserted item', 'Carol member mutations did not change Org B item');
 select is((select count(*) from public.saas_projects where id in ('60000000-0000-4000-8000-000000000002', '60000000-0000-4000-8000-000000000004')), 0::bigint, 'Owner project deletes removed both tenant targets');
 select is((select count(*) from public.saas_items where id in ('70000000-0000-4000-8000-000000000002', '70000000-0000-4000-8000-000000000003', '70000000-0000-4000-8000-000000000005', '70000000-0000-4000-8000-000000000006')), 0::bigint, 'Owner deletes and project cascades removed exact item targets');
+select is((select count(*) from pg_class c join pg_namespace n on n.oid = c.relnamespace where n.nspname = 'public' and c.relname in ('saas_organizations', 'saas_organization_members', 'saas_projects', 'saas_items') and c.relrowsecurity), 4::bigint, 'Catalog confirms RLS on all SaaS recipe tables');
+select is((select count(*) from pg_policies where schemaname = 'public' and tablename in ('saas_organizations', 'saas_organization_members', 'saas_projects', 'saas_items')), 10::bigint, 'Catalog confirms the complete SaaS policy set');
+select is((select count(*) from pg_policies where schemaname = 'public' and tablename in ('saas_projects', 'saas_items') and cmd = 'UPDATE' and with_check is not null), 2::bigint, 'Catalog confirms project and item UPDATE WITH CHECK policies');
 
 select * from finish();
 rollback;

@@ -4,7 +4,7 @@
 
 1. **Shared doctrine:** threat model, authorization model, RLS principles, testing strategy, and operational guidance.
 2. **Recipe fixtures:** independent schema, policy, seed, and test units following one contract.
-3. **Verification:** local reconstruction, authorization matrices, static/security checks, and future CI.
+3. **Verification:** local reconstruction, authorization matrices, catalog/static/security checks, and pinned CI.
 4. **Delivery controls:** contribution, review, drift, and release checklists.
 
 ## Recipe isolation

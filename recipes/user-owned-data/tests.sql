@@ -4,7 +4,7 @@ begin;
 \ir policies.sql
 \ir seed.sql
 
-select plan(32);
+select plan(35);
 
 select set_config(
   'request.jwt.claim.sub',
@@ -35,7 +35,7 @@ select is(
     where id = '20000000-0000-4000-8000-000000000002'
   ),
   0::bigint,
-  'Alice cannot select Bob note'
+  '[deny:select] Alice cannot select Bob note'
 );
 select lives_ok(
   $$
@@ -68,7 +68,7 @@ select throws_ok(
   $$,
   '42501',
   'new row violates row-level security policy for table "user_owned_notes"',
-  'Alice cannot forge Bob ownership on insert'
+  '[deny:insert] Alice cannot forge Bob ownership on insert'
 );
 select lives_ok(
   $$
@@ -104,7 +104,7 @@ select is_empty(
     where id = '20000000-0000-4000-8000-000000000002'
     returning 1
   $$,
-  'Alice update of Bob note affects no rows'
+  '[deny:update] Alice update of Bob note affects no rows'
 );
 select is_empty(
   $$
@@ -112,7 +112,7 @@ select is_empty(
     where id = '20000000-0000-4000-8000-000000000004'
     returning 1
   $$,
-  'Alice delete of Bob note affects no rows'
+  '[deny:delete] Alice delete of Bob note affects no rows'
 );
 select results_eq(
   $$
@@ -322,6 +322,9 @@ select is(
   4::bigint,
   'Final state contains only allowed surviving rows'
 );
+select is((select count(*) from pg_class c join pg_namespace n on n.oid = c.relnamespace where n.nspname = 'public' and c.relname = 'user_owned_notes' and c.relrowsecurity), 1::bigint, 'Catalog confirms RLS on the recipe table');
+select is((select count(*) from pg_policies where schemaname = 'public' and tablename = 'user_owned_notes'), 4::bigint, 'Catalog has one policy per CRUD command');
+select is((select count(*) from pg_policies where schemaname = 'public' and tablename = 'user_owned_notes' and cmd = 'UPDATE' and with_check is not null), 1::bigint, 'Catalog confirms UPDATE WITH CHECK');
 
 select * from finish();
 

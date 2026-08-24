@@ -24,7 +24,7 @@ Each recipe is an isolated fixture with schema, policies, seed data, tests, and 
 
 ## Current phase
 
-The reproducible local foundation is present: a pinned project-scoped Supabase CLI, local configuration, npm scripts, and a pgTAP smoke test. Recipe SQL and CI remain deferred to their scoped phases.
+The reproducible local foundation, seven independent recipes, adversarial matrices, and pinned local-only CI workflow are present. CI uses the project-scoped Supabase CLI and requires no hosted project or credentials.
 
 The pre-foundation repository/tooling audit is recorded in [AUDIT_2026-08-24.md](AUDIT_2026-08-24.md).
 

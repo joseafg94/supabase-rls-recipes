@@ -4,7 +4,7 @@ begin;
 \ir policies.sql
 \ir seed.sql
 
-select plan(35);
+select plan(38);
 
 select set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-000000000001', true);
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-000000000001","role":"authenticated"}', true);
@@ -16,7 +16,7 @@ select is((select count(*) from public.membership_organizations where id = '1000
 select is((select count(*) from public.membership_organization_members), 1::bigint, 'Alice sees only her membership row');
 select is((select count(*) from public.membership_organization_members where user_id = '00000000-0000-4000-8000-000000000002'), 0::bigint, 'Alice cannot read Bob membership directly');
 select is((select count(*) from public.membership_resources), 2::bigint, 'Alice sees only Org A resources');
-select is((select count(*) from public.membership_resources where id = '30000000-0000-4000-8000-000000000002'), 0::bigint, 'Alice cannot see Org B resource');
+select is((select count(*) from public.membership_resources where id = '30000000-0000-4000-8000-000000000002'), 0::bigint, '[deny:select] Alice cannot see Org B resource');
 select lives_ok(
   $$insert into public.membership_resources (id, organization_id, name) values ('30000000-0000-4000-8000-000000000005', '10000000-0000-4000-8000-000000000001', 'Alice Org A insert')$$,
   'Alice inserts an Org A resource'
@@ -26,7 +26,7 @@ select throws_ok(
   $$insert into public.membership_resources (id, organization_id, name) values ('30000000-0000-4000-8000-000000000006', '10000000-0000-4000-8000-000000000002', 'Forged Org B insert')$$,
   '42501',
   'new row violates row-level security policy for table "membership_resources"',
-  'Alice cannot forge Org B on insert'
+  '[deny:insert] Alice cannot forge Org B on insert'
 );
 select lives_ok(
   $$update public.membership_resources set name = 'Org A updated' where id = '30000000-0000-4000-8000-000000000001'$$,
@@ -34,7 +34,7 @@ select lives_ok(
 );
 select is_empty(
   $$update public.membership_resources set name = 'Cross-org update' where id = '30000000-0000-4000-8000-000000000002' returning 1$$,
-  'Alice update of Org B affects no rows'
+  '[deny:update] Alice update of Org B affects no rows'
 );
 select results_eq(
   $$delete from public.membership_resources where id = '30000000-0000-4000-8000-000000000003' returning 1$$,
@@ -43,7 +43,7 @@ select results_eq(
 );
 select is_empty(
   $$delete from public.membership_resources where id = '30000000-0000-4000-8000-000000000004' returning 1$$,
-  'Alice delete of Org B affects no rows'
+  '[deny:delete] Alice delete of Org B affects no rows'
 );
 select throws_ok(
   $$insert into public.membership_organization_members (organization_id, user_id, joined_at) values ('10000000-0000-4000-8000-000000000002', '00000000-0000-4000-8000-000000000001', '2026-01-02 00:00:00+00')$$,
@@ -107,6 +107,9 @@ select is((select name from public.membership_resources where id = '30000000-000
 select is((select name from public.membership_resources where id = '30000000-0000-4000-8000-000000000002'), 'Org B updated', 'Org B row kept only its authorized update');
 select is((select count(*) from public.membership_resources where id in ('30000000-0000-4000-8000-000000000003', '30000000-0000-4000-8000-000000000004')), 0::bigint, 'Authorized deletes removed their targets');
 select is((select count(*) from public.membership_resources), 4::bigint, 'Final resource state contains only authorized survivors');
+select is((select count(*) from pg_class c join pg_namespace n on n.oid = c.relnamespace where n.nspname = 'public' and c.relname in ('membership_organizations', 'membership_organization_members', 'membership_resources') and c.relrowsecurity), 3::bigint, 'Catalog confirms RLS on all membership recipe tables');
+select is((select count(*) from pg_policies where schemaname = 'public' and tablename in ('membership_organizations', 'membership_organization_members', 'membership_resources')), 6::bigint, 'Catalog confirms the membership policy set');
+select is((select count(*) from pg_policies where schemaname = 'public' and tablename = 'membership_resources' and cmd = 'UPDATE' and with_check is not null), 1::bigint, 'Catalog confirms resource UPDATE WITH CHECK');
 
 select * from finish();
 rollback;

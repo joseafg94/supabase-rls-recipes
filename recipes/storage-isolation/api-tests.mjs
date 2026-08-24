@@ -143,7 +143,7 @@ try {
 
   ok((await upload(bucket, alicePath, userHeaders(aliceId), 'alice-v1')).ok, 'Alice upload to Alice/Org A path failed')
   ok((await upload(bucket, bobPath, userHeaders(bobId), 'bob-v1')).ok, 'Bob upload to Bob/Org B path failed')
-  ok(!(await upload(bucket, aliceToBobPath, userHeaders(aliceId), 'cross')).ok, 'Alice uploaded to Bob path')
+  ok(!(await upload(bucket, aliceToBobPath, userHeaders(aliceId), 'cross')).ok, '[deny:upload] Alice uploaded to Bob path')
   ok(!(await upload(bucket, forgedTenantPath, userHeaders(aliceId), 'forged')).ok, 'Alice forged Org B path')
   ok(!(await upload(otherBucket, alicePath, userHeaders(aliceId), 'wrong-bucket')).ok, 'Alice escaped bucket scope')
 
@@ -152,7 +152,7 @@ try {
   const aliceObjects = await aliceList.json()
   ok(aliceObjects.length === 1 && aliceObjects[0].name === 'alice.txt', 'Alice list did not return only her object')
   const aliceCrossList = await list(bucket, userHeaders(aliceId), `${orgB}/${bobId}`)
-  ok(aliceCrossList.ok && (await aliceCrossList.json()).length === 0, 'Alice listed Bob path')
+  ok(aliceCrossList.ok && (await aliceCrossList.json()).length === 0, '[deny:list] Alice listed Bob path')
 
   const bobList = await list(bucket, userHeaders(bobId), `${orgB}/${bobId}`)
   ok(bobList.ok, 'Bob list request failed')
@@ -161,7 +161,7 @@ try {
 
   const aliceDownload = await download(bucket, alicePath, userHeaders(aliceId))
   ok(aliceDownload.ok && (await aliceDownload.text()) === 'alice-v1', 'Alice could not download her object')
-  ok(!(await download(bucket, bobPath, userHeaders(aliceId))).ok, 'Alice downloaded Bob object')
+  ok(!(await download(bucket, bobPath, userHeaders(aliceId))).ok, '[deny:read] Alice downloaded Bob object')
   const bobDownload = await download(bucket, bobPath, userHeaders(bobId))
   ok(bobDownload.ok && (await bobDownload.text()) === 'bob-v1', 'Bob could not download his object')
   ok(!(await download(bucket, alicePath, { apikey: publishableKey })).ok, 'Anonymous downloaded private object')
@@ -171,12 +171,13 @@ try {
   ok((await update(bucket, alicePath, userHeaders(aliceId), 'alice-update')).ok, 'Alice UPDATE failed')
   const updated = await download(bucket, alicePath, userHeaders(aliceId))
   ok(updated.ok && (await updated.text()) === 'alice-update', 'Alice UPDATE content mismatch')
+  ok(!(await update(bucket, bobPath, userHeaders(aliceId), 'cross-update')).ok, '[deny:update] Alice updated Bob object')
   ok((await upload(bucket, alicePath, userHeaders(aliceId), 'alice-upsert', true)).ok, 'Alice upsert failed')
   const upserted = await download(bucket, alicePath, userHeaders(aliceId))
   ok(upserted.ok && (await upserted.text()) === 'alice-upsert', 'Alice upsert content mismatch')
-  ok(!(await upload(bucket, bobPath, userHeaders(aliceId), 'cross-upsert', true)).ok, 'Alice upserted Bob object')
+  ok(!(await upload(bucket, bobPath, userHeaders(aliceId), 'cross-upsert', true)).ok, '[deny:upsert] Alice upserted Bob object')
 
-  ok(!(await remove(bucket, bobPath, userHeaders(aliceId))).ok, 'Alice deleted Bob object')
+  ok(!(await remove(bucket, bobPath, userHeaders(aliceId))).ok, '[deny:delete] Alice deleted Bob object')
   ok((await remove(bucket, alicePath, userHeaders(aliceId))).ok, 'Alice could not delete her object')
   ok((await remove(bucket, bobPath, userHeaders(bobId))).ok, 'Bob could not delete his object')
 

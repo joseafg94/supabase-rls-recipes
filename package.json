@@ -11,6 +11,9 @@
     "db:lint": "supabase db lint --local --level warning --fail-on error",
     "test:db": "supabase test db --local",
     "verify:db": "npm run db:reset && npm run db:lint && npm run test:db",
+    "test:catalog": "node scripts/verify-test-catalog.mjs",
+    "scan:secrets": "node scripts/scan-secrets.mjs",
+    "verify:ci": "node scripts/verify-ci.mjs",
     "db:stop": "supabase stop"
   },
   "devDependencies": {
