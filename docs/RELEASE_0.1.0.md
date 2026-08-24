@@ -57,11 +57,16 @@ The [Supabase breaking-change catalog](https://supabase.com/changelog?types=brea
 
 ## Manual publication action
 
-After the release-preparation commit is on `main` and its GitHub Actions verification passes, create and publish only the approved tag and release:
+First push the release-preparation commit so GitHub Actions can verify the exact candidate:
+
+```sh
+git push origin main
+```
+
+After the `Verify RLS recipes` workflow passes for that commit, create and publish only the approved tag and release:
 
 ```sh
 git tag -a v0.1.0 -m "Supabase RLS Recipes 0.1.0"
-git push origin main
 git push origin v0.1.0
 gh release create v0.1.0 --verify-tag --title "Supabase RLS Recipes 0.1.0" --notes-file docs/RELEASE_0.1.0.md
 ```
