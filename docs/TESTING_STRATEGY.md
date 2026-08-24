@@ -29,6 +29,20 @@ Every supported command includes the authorized actor/target pair and its neares
 
 Use fixed fictional UUIDs. Each test must explicitly set or obtain the intended Postgres role and JWT claims through the harness selected in phase 01, then reset them between cases. Never run app-user assertions as table owner, superuser, or a role with `BYPASSRLS`.
 
+| Fixture | UUID |
+| --- | --- |
+| Alice | `00000000-0000-4000-8000-000000000001` |
+| Bob | `00000000-0000-4000-8000-000000000002` |
+| Carol | `00000000-0000-4000-8000-000000000003` |
+| Org A | `10000000-0000-4000-8000-000000000001` |
+| Org B | `10000000-0000-4000-8000-000000000002` |
+
+Additional fixture UUIDs use a documented category prefix and monotonically increasing final segment; existing identifiers are never repurposed.
+
+## Local commands
+
+Run `npm ci`, `npm run db:start`, `npm run verify:db`, and `npm run db:stop`. `verify:db` uses explicit local-only flags for reset, lint, and pgTAP; it must never be changed to `--linked`.
+
 ## Assertions
 
 - Assert exact rows and counts, not only lack of error.

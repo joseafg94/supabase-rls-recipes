@@ -34,13 +34,16 @@ Recipes are intentionally not implemented in this foundation phase. Their requir
 
 ## Quick start
 
-1. Read [docs/PROJECT_CONTEXT.md](docs/PROJECT_CONTEXT.md), [docs/THREAT_MODEL.md](docs/THREAT_MODEL.md), and [docs/AUTHORIZATION_MODEL.md](docs/AUTHORIZATION_MODEL.md).
-2. Choose a phase from `prompts/`; do not skip its stop condition.
-3. Implement one recipe with `README.md`, `schema.sql`, `policies.sql`, `seed.sql`, and `tests.sql`.
-4. Run the recipe from a clean local Supabase database and execute its complete authorization matrix.
-5. Review [checklists/RECIPE_CHECKLIST.md](checklists/RECIPE_CHECKLIST.md) before merging.
+Prerequisites are Node.js 20+ and a running Docker-compatible runtime. The project pins its Supabase CLI; no global CLI or hosted project is required.
 
-Local Supabase setup and exact CLI commands are deliberately deferred to the foundation implementation phase. Discover commands from the installed CLI with `supabase --help`; do not rely on remembered syntax.
+```sh
+npm ci
+npm run db:start
+npm run verify:db
+npm run db:stop
+```
+
+`verify:db` resets only the local database, lints it, and runs pgTAP. Then read [docs/PROJECT_CONTEXT.md](docs/PROJECT_CONTEXT.md), select one phase from `prompts/`, and follow its stop condition.
 
 ## Repository map
 
@@ -73,7 +76,7 @@ Positive-only tests do not establish isolation. See [docs/TESTING_STRATEGY.md](d
 
 ## Prerequisites
 
-Implementation phases will require PostgreSQL, the Supabase CLI, Docker-compatible local containers, and a SQL test runner selected in phase 01. This planning package installs nothing and contains no production SQL.
+Local development requires Node.js 20+, npm, and a running Docker-compatible runtime. `npm ci` installs the exact Supabase CLI version from `package-lock.json`; PostgreSQL and pgTAP run inside the CLI-managed containers.
 
 ## Contributing
 

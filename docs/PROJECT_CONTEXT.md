@@ -24,9 +24,9 @@ Each recipe is an isolated fixture with schema, policies, seed data, tests, and 
 
 ## Current phase
 
-Only planning, standards, templates, checklists, and scoped prompts are included. Recipe SQL, Supabase initialization, dependencies, and CI workflow are deferred.
+The reproducible local foundation is present: a pinned project-scoped Supabase CLI, local configuration, npm scripts, and a pgTAP smoke test. Recipe SQL and CI remain deferred to their scoped phases.
 
-The current repository/tooling audit is recorded in [AUDIT_2026-08-24.md](AUDIT_2026-08-24.md).
+The pre-foundation repository/tooling audit is recorded in [AUDIT_2026-08-24.md](AUDIT_2026-08-24.md).
 
 ## Decision record
 

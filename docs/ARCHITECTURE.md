@@ -9,7 +9,7 @@
 
 ## Recipe isolation
 
-Each recipe owns its objects and deterministic fixture data. A recipe must not depend on another recipe's schema or execution order. Namespacing strategy and reset mechanics are selected in phase 01 after validating local tooling.
+Each recipe owns its objects and deterministic fixture data. A recipe must not depend on another recipe's schema or execution order. The test harness applies one recipe fixture to clean local state; recipe SQL remains outside global migrations.
 
 ## Database boundaries
 
@@ -25,7 +25,7 @@ Prefer operation-specific policies (`SELECT`, `INSERT`, `UPDATE`, `DELETE`) with
 
 ## Dependencies
 
-The intended local stack is Supabase CLI plus its managed local PostgreSQL services. The exact test harness is an open decision for phase 01; it must produce deterministic exit codes and make actor context explicit. No application framework is required.
+The local stack is Supabase CLI 2.115.0, installed as an exact npm development dependency, plus its Docker-managed PostgreSQL services. Database tests use the CLI's native pgTAP runner and explicit actor context. No application framework or hosted Supabase project is required.
 
 ## Source of truth
 
